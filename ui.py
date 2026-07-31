@@ -11,7 +11,7 @@ from mysql_api import test_connection
 # =========================================================
 
 st.set_page_config(
-    page_title="Enterprise AI Agent",
+    page_title="JIRA AI Agent",
     page_icon="🤖",
     layout="wide"
 )
@@ -32,7 +32,7 @@ if "messages" not in st.session_state:
 # HEADER
 # =========================================================
 
-st.title("🤖 Enterprise AI Agent")
+st.title("JIRA AI Agent")
 st.caption("Jira + MySQL + Multi-Tool Assistant")
 
 
@@ -123,7 +123,7 @@ for message in st.session_state.messages:
 # USER INPUT
 # =========================================================
 
-prompt = st.chat_input("Ask your enterprise agent...")
+prompt = st.chat_input("Ask the agent...")
 
 
 # =========================================================

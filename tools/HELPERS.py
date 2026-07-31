@@ -66,7 +66,8 @@ def normalize_project_key(project):
 
     if not project:
         return project
-
+    
+    print("[NORMALIZE DEBUG]", project)
     return project.strip().upper().replace("-", "")
 
 

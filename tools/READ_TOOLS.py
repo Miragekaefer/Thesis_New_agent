@@ -349,10 +349,15 @@ def route_department_tool(input_data):
     )
 
 def db_lookup_tool(input_data):
+    """
+    Look up production information by ID and return
+    relevant details for ticket creation.
+    """
     production_id = pick(
         input_data,
         "production_id",
-        "id"
+        "id",
+        "productionId"
     )
 
     if not production_id:
@@ -361,10 +366,77 @@ def db_lookup_tool(input_data):
             ["production_id"]
         )
 
-    return fail(
-        f"Database integration not implemented for {production_id}",
-        future_tool=True
-    )
+    try:
+        # Query production data
+        query = f"""
+            SELECT *
+            FROM production
+            WHERE id = '{production_id}'
+            LIMIT 1
+        """
+
+        if not validate_sql_query(query):
+            return fail("Invalid production ID format")
+
+        result = execute_select_query(query)
+        rows = result.get("rows", [])
+
+        if not rows:
+            return fail(
+                f"No production record found for ID: {production_id}"
+            )
+
+        record = rows[0]
+
+        # Build enriched ticket information
+        enriched = {
+            "production_id": production_id,
+            "found": True,
+            "record": record,
+            "suggested_summary": f"Production issue for ID {production_id}",
+            "suggested_description": format_record_for_description(record)
+        }
+
+        # Try to infer department
+        if "department" in record:
+            enriched["inferred_project"] = record["department"]
+
+        return ok(data=enriched)
+
+    except Exception as e:
+        return fail(str(e))
+
+
+def format_record_for_description(record):
+    """
+    Convert database record into readable ticket description.
+    """
+    lines = ["**Auto-extracted from production database:**", ""]
+
+    priority_fields = [
+        "name", "title", "type", "status", "description",
+        "severity", "reported_by", "location", "asset_id"
+    ]
+
+    for key in priority_fields:
+        if key in record and record[key]:
+            formatted_key = key.replace("_", " ").title()
+            lines.append(f"- **{formatted_key}:** {record[key]}")
+
+    # Add other fields
+    other_fields = [
+        k for k in record.keys()
+        if k not in priority_fields and record[k]
+    ]
+
+    if other_fields:
+        lines.append("")
+        lines.append("**Additional Details:**")
+        for key in other_fields:
+            formatted_key = key.replace("_", " ").title()
+            lines.append(f"- {formatted_key}: {record[key]}")
+
+    return "\n".join(lines)
 
 def ask_user_tool(input_data):
     question = pick(
