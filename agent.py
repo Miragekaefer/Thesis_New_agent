@@ -249,6 +249,8 @@ class JiraAgent:
 
             if tool_name not in TOOLS:
                 return f"Unknown tool selected: {tool_name}"
+            if tool_name not in TOOLS:
+                return f"Unknown tool selected: {tool_name}"
 
             # -------------------------------------------------
             # READ TOOLS
@@ -264,20 +266,7 @@ class JiraAgent:
                     result=result
                 )
 
-                user_goal = f"""
-                Original Question:
-
-                {user_input}
-
-                Retrieved Information:
-
-                {result}
-
-                Using the retrieved information,
-                answer the user's original question.
-                """
-
-                continue
+                return result
 
             # -------------------------------------------------
             # PLANNING TOOLS

@@ -284,7 +284,8 @@ def workload_tool(input_data):
         input_data,
         "name",
         "assignee",
-        "user"
+        "user",
+        "user_name"
     )
 
     if not person:
